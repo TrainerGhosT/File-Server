@@ -1,7 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from Client.client import send_request, upload_file
+from Client.client import upload_file, send_request
 
 class FileServerApp(tk.Tk):
     def __init__(self):
@@ -15,11 +15,10 @@ class FileServerApp(tk.Tk):
         upload_button = tk.Button(self, text="Subir Archivo", command=self.upload_file, bg='gray', fg='white')
         upload_button.pack(pady=20)
 
-        view_button = tk.Button(self, text="Ver Archivos", command=self.view_files, bg='gray', fg='white')
-        view_button.pack(pady=20)
-
-        self.file_list = tk.Text(self, height=10, width=50, bg='black', fg='white')
+        self.file_list = tk.Listbox(self, height=10, width=50, bg='black', fg='white')
         self.file_list.pack(pady=20)
+
+        self.update_file_list()  # Inicializar la lista de archivos al iniciar
 
     def upload_file(self):
         file_path = filedialog.askopenfilename()
@@ -29,12 +28,14 @@ class FileServerApp(tk.Tk):
             filename = os.path.basename(file_path)
             response = upload_file(filename, content)
             messagebox.showinfo("Resultado", response)
+            self.update_file_list()  # Actualizar la lista de archivos después de subir uno nuevo
 
-    def view_files(self):
+    def update_file_list(self):
+        self.file_list.delete(0, tk.END)  # Limpiar la lista de archivos
         request = "LIST_FILES"
         files = send_request(request)
-        self.file_list.delete(1.0, tk.END)
-        self.file_list.insert(tk.END, files)
+        for file in files.split('\n'):
+            self.file_list.insert(tk.END, file)  # Insertar cada archivo en la lista
 
 if __name__ == "__main__":
     app = FileServerApp()
