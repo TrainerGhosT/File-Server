@@ -10,7 +10,7 @@ def start_server(host='localhost', port = 5555):
 
     while True:
         client_socket, address = server_socket.accept()
-        print(f"Conexión aceptada de {address}")
+        print(f"Conexion aceptada de {address}")
         client_handler = threading.Thread(target=handle_client, args=(client_socket,))
         client_handler.start()
 

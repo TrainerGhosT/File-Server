@@ -15,5 +15,5 @@ if __name__ == "__main__":
     
     run_ui()
     
-    #para cerrar sever cuando se cierra el ui
-    print("Cerrando la aplicación...")
+    #para cerrar server cuando se cierra el ui
+    print("Cerrando la aplicacion...")
