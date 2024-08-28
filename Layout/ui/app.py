@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from Client.client import upload_file, send_request
+import subprocess
 
 class FileServerApp(tk.Tk):
     def __init__(self):
@@ -17,6 +18,9 @@ class FileServerApp(tk.Tk):
 
         self.file_list = tk.Listbox(self, height=10, width=50, bg='black', fg='white')
         self.file_list.pack(pady=20)
+
+        open_button = tk.Button(self, text="Abrir Archivo", command=self.open_selected_file, bg='gray', fg='white')
+        open_button.pack(pady=10)
 
         self.update_file_list()  # Inicializar la lista de archivos al iniciar
 
@@ -36,6 +40,18 @@ class FileServerApp(tk.Tk):
         files = send_request(request)
         for file in files.split('\n'):
             self.file_list.insert(tk.END, file)  # Insertar cada archivo en la lista
+
+    def open_selected_file(self): #Abrir archivo seleccionado
+        selected_file = self.file_list.get(tk.ACTIVE)
+        if selected_file:
+            filepath = os.path.join('Data', 'upload', selected_file)
+            if os.path.exists(filepath):
+                if os.name == 'nt':  # Windows
+                    os.startfile(filepath)
+                elif os.name == 'posix':  # macOS o Linux
+                    subprocess.call(('open', filepath) if sys.platform == 'darwin' else ('xdg-open', filepath))
+            else:
+                messagebox.showerror("Error", "El archivo no se encuentra.")
 
 if __name__ == "__main__":
     app = FileServerApp()
