@@ -140,6 +140,16 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
         )
         open_button.pack(pady=15, fill=tk.X)
 
+        download_button = ttk.Button(
+            file_frame,
+            text="Descargar",
+            command=lambda: self.download_file(filename),
+            style="Outline.TButton",
+            padding=(8, 4),  # Taller buttons for better interaction
+            width=20,  # Increased width for uniformity
+        )
+        download_button.pack(pady=15, fill=tk.X)
+
     def open_file(self, filename):
         filepath = os.path.join("Data", "upload", filename)
         if os.path.exists(filepath):
@@ -151,6 +161,18 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
                     if sys.platform == "darwin"
                     else ("xdg-open", filepath)
                 )
+        else:
+            messagebox.showerror("Error", "El archivo no se encuentra.")
+
+    def download_file(self, filename):
+        filepath = os.path.join("Data", "upload", filename)
+        if os.path.exists(filepath):
+            save_path = filedialog.asksaveasfilename(defaultextension="*.*", initialfile=filename)
+            if save_path:
+                with open(filepath, 'rb') as f_src:
+                    with open(save_path, 'wb') as f_dest:
+                        f_dest.write(f_src.read())
+                messagebox.showinfo("Resultado", f"Archivo {filename} descargado con éxito.")
         else:
             messagebox.showerror("Error", "El archivo no se encuentra.")
 
