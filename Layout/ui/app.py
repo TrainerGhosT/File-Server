@@ -4,6 +4,9 @@ from tkinter import filedialog, messagebox
 from Client.client import upload_file, send_request
 import subprocess
 from PIL import Image, ImageTk, ImageOps
+import matplotlib.pyplot as plt
+import pandas as pd
+from collections import Counter
 import ttkbootstrap as ttk  # Import ttkbootstrap for modern UI
 
 class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
@@ -58,6 +61,15 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
             style="Outline.TButton",
         )
         delete_button.pack(side=tk.LEFT, padx=20)
+
+        # Button to generate report
+        report_button = ttk.Button(
+            button_frame,
+            text="Generar Reporte",
+            command=self.generate_report,
+            style="Outline.TButton",
+        )
+        report_button.pack(side=tk.LEFT, padx=20)
 
         # Updated file display frame with padding and expandable layout
         self.file_frame = ttk.Frame(self)
@@ -187,6 +199,25 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
             self.update_file_list()
         else:
             messagebox.showerror("Error", "La carpeta no existe.")
+
+    def generate_report(self):
+        folder = os.path.join("Data", "upload")
+        files = os.listdir(folder)
+        if files:
+            extensions = [file.split('.')[-1].lower() for file in files]
+            extension_count = Counter(extensions)
+
+            df = pd.DataFrame(list(extension_count.items()), columns=['Extension', 'Count'])
+            df = df.sort_values('Count', ascending=False)
+
+            plt.figure(figsize=(10, 6))
+            plt.bar(df['Extension'], df['Count'], color='skyblue')
+            plt.title("Distribución de Tipos de Archivos Subidos")
+            plt.xlabel("Extensión del Archivo")
+            plt.ylabel("Cantidad")
+            plt.show()
+        else:
+            messagebox.showinfo("Reporte", "No hay archivos para generar el reporte.")
 
 if __name__ == "__main__":
     app = FileServerApp()
