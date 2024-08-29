@@ -9,6 +9,7 @@ import pandas as pd
 from collections import Counter
 import ttkbootstrap as ttk  # Import ttkbootstrap for modern UI
 
+
 class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
     def __init__(self):
         super().__init__(themename="vapor")  # Apply the vapor theme
@@ -17,8 +18,17 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
         self.create_widgets()
 
     def create_widgets(self):
-        # Use the 'outline' style provided by the vapor theme
-        # for outline buttons
+        # Título del proyecto
+        title_label = ttk.Label(
+            self,
+            text="Proyecto Final - File Server App",
+            font=("Poppins", 20, "bold"),
+            foreground="#6D28D9",  # Color púrpura
+            anchor="w",  # Alineación a la izquierda
+        )
+        title_label.pack(pady=(20, 10), padx=20, anchor="nw")
+
+        # Use the 'outline' style provided by the vapor theme for outline buttons
         style = ttk.Style()
         style.configure(
             "Outline.TButton",
@@ -122,9 +132,7 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
 
     def create_file_display(self, filename, file_icon):
         # File display with Google Drive style (rounded corners)
-        file_frame = ttk.Frame(
-            self.file_frame
-        )
+        file_frame = ttk.Frame(self.file_frame)
         file_frame.pack(side=tk.LEFT, padx=20, pady=20)
 
         icon_label = ttk.Label(file_frame, image=file_icon)
@@ -179,12 +187,16 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
     def download_file(self, filename):
         filepath = os.path.join("Data", "upload", filename)
         if os.path.exists(filepath):
-            save_path = filedialog.asksaveasfilename(defaultextension="*.*", initialfile=filename)
+            save_path = filedialog.asksaveasfilename(
+                defaultextension="*.*", initialfile=filename
+            )
             if save_path:
-                with open(filepath, 'rb') as f_src:
-                    with open(save_path, 'wb') as f_dest:
+                with open(filepath, "rb") as f_src:
+                    with open(save_path, "wb") as f_dest:
                         f_dest.write(f_src.read())
-                messagebox.showinfo("Resultado", f"Archivo {filename} descargado con éxito.")
+                messagebox.showinfo(
+                    "Resultado", f"Archivo {filename} descargado con éxito."
+                )
         else:
             messagebox.showerror("Error", "El archivo no se encuentra.")
 
@@ -204,20 +216,50 @@ class FileServerApp(ttk.Window):  # Inherit from ttk.Window for modern styling
         folder = os.path.join("Data", "upload")
         files = os.listdir(folder)
         if files:
-            extensions = [file.split('.')[-1].lower() for file in files]
+            extensions = [file.split(".")[-1].lower() for file in files]
             extension_count = Counter(extensions)
 
-            df = pd.DataFrame(list(extension_count.items()), columns=['Extension', 'Count'])
-            df = df.sort_values('Count', ascending=False)
+            df = pd.DataFrame(
+                list(extension_count.items()), columns=["Extension", "Count"]
+            )
+            df = df.sort_values("Count", ascending=False)
 
-            plt.figure(figsize=(10, 6))
-            plt.bar(df['Extension'], df['Count'], color='skyblue')
-            plt.title("Distribución de Tipos de Archivos Subidos")
-            plt.xlabel("Extensión del Archivo")
-            plt.ylabel("Cantidad")
+            # Apply dark theme to the plot
+            plt.style.use("dark_background")  # Use Matplotlib's dark background
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            bars = ax.bar(
+                df["Extension"],
+                df["Count"],
+                color="#6D28D9",
+                edgecolor="white",
+                linewidth=0.4,
+            )
+
+            # Rounded bar edges
+            for bar in bars:
+                bar.set_linewidth(1.5)
+                bar.set_edgecolor("#5B21B6")  # Purple color consistent with buttons
+                bar.set_alpha(0.85)  # Slight transparency for effect
+
+            ax.set_title(
+                "Reporte - Distribución de Tipos de Archivos Subidos", color="#6D28D9"
+            )
+            ax.set_xlabel("Extensión del Archivo", color="#94A3B8")
+            ax.set_ylabel("Cantidad", color="#94A3B8")
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+            ax.spines["left"].set_color("white")
+            ax.spines["bottom"].set_color("white")
+            ax.tick_params(axis="x", colors="white")
+            ax.tick_params(axis="y", colors="white")
+
             plt.show()
         else:
-            messagebox.showinfo("Reporte", "No hay archivos para generar el reporte.")
+            messagebox.showerror(
+                "Error Reporte", "No hay archivos para generar el reporte."
+            )
+
 
 if __name__ == "__main__":
     app = FileServerApp()
